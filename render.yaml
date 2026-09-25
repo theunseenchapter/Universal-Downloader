@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: dropzone
+    runtime: node
+    plan: free
+    buildCommand: python -m pip install --user yt-dlp && npm install && npm run build
+    startCommand: tsx server.ts
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: YTDLP_PATH
+        value: yt-dlp
+      - key: APP_URL
+        sync: false
+
+  - type: cron
+    name: dropzone-keep-awake
+    runtime: node
+    schedule: "*/10 * * * *"
+    buildCommand: ""
+    startCommand: curl --fail --silent --show-error "$APP_URL/healthz"
+    envVars:
+      - key: APP_URL
+        sync: false

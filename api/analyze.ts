@@ -10,10 +10,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
     const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body
     const { url: rawUrl } = mediaRequestSchema.parse(body)
     const url = validatePublicUrl(rawUrl)
-    const platform = platformFor(url.hostname)
-    if (platform !== 'direct') throw new Error(`${platform} links need an approved provider integration. This deployment does not bypass platform access controls.`)
     const provider = providerFor(url)
-    if (!provider) throw new Error('This source needs a configured provider. Direct public media URLs are supported by default.')
+    if (!provider) throw new Error(`${platformFor(url.hostname)} links need an approved provider integration. This deployment does not bypass platform access controls.`)
     const media = await provider.analyze(url)
     return response.status(200).json({ success: true, media })
   } catch (error) { return response.status(400).json({ success: false, error: safeResponse(error) }) }

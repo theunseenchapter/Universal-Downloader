@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "start": "npm run build && tsx server.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -28,6 +29,7 @@
     "globals": "^17.12.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.69.0",
+    "tsx": "^4.19.4",
     "vite": "^7.1.7"
   }
 }

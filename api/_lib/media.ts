@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const mediaRequestSchema = z.object({ url: z.string().trim().url().max(2048) })
-export const downloadRequestSchema = mediaRequestSchema.extend({ formatId: z.string().regex(/^[a-z-]+$/) })
+export const downloadRequestSchema = mediaRequestSchema.extend({ formatId: z.string().regex(/^[a-zA-Z0-9_.-]+$/) })
 
 export type MediaFormat = { id: string; type: 'video' | 'audio'; format: string; quality: string; filesize?: number }
 export type MediaInfo = { title: string; thumbnail?: string; duration?: number; platform: string; formats: MediaFormat[] }

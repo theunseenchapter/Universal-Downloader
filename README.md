@@ -4,9 +4,9 @@ Dropzone is a serverless-first React/Vite media downloader interface for public 
 
 ## Current provider boundary
 
-The included provider is the `direct` provider. It supports public `.mp4`, `.webm`, `.mov`, `.m4v`, `.mp3`, `.m4a`, `.wav`, and `.ogg` URLs. It performs a safe `HEAD` request, returns source metadata, and sends the browser to the public source URL for download.
+The included providers are `direct` and optional `yt-dlp`. The direct provider supports public `.mp4`, `.webm`, `.mov`, `.m4v`, `.mp3`, `.m4a`, `.wav`, and `.ogg` URLs. The YouTube provider uses a server-installed `yt-dlp` executable to inspect public videos and resolve a temporary media URL at download time.
 
-YouTube, Pinterest, Instagram, TikTok, and X/Twitter URLs are detected and rejected with a clear provider-not-configured response. This is intentional: adding those providers requires an approved API or extraction service that respects each platform's terms, authentication, robots rules, copyright, and access controls. No DRM, paywall, login, private-account, or region-control bypasses are implemented.
+Pinterest, Instagram, TikTok, and X/Twitter URLs are detected and rejected with a clear provider-not-configured response. YouTube requires `yt-dlp` to be installed on the server and available through `YTDLP_PATH` (or the system `PATH`). Use it only for public media you are authorized to save and in accordance with YouTube's terms. No DRM, paywall, login, private-account, or region-control bypasses are implemented.
 
 ## Run locally
 
@@ -21,6 +21,12 @@ The Vite frontend expects `/api/analyze` and `/api/download`. For the complete f
 npm run build
 npm run lint
 ```
+
+## Deploy to Render
+
+The included `render.yaml` defines a Node web service that serves the built frontend, adapts the existing API handlers, installs `yt-dlp`, and exposes `/healthz`. It also defines a ten-minute cron job that requests `${APP_URL}/healthz`; set `APP_URL` on both Render services to the deployed web-service URL.
+
+Render's free web services can sleep when idle. The cron request keeps the service receiving traffic, but it is not a substitute for a paid always-on instance and should not be used to conceal application failures. Render may also restrict cron jobs or background activity on some plans.
 
 ## Deploy to Vercel
 
@@ -58,5 +64,6 @@ Implement a provider with `canHandle`, `analyze`, `getFormats`, and `download`, 
 - `MAX_FILE_SIZE_MB`: maximum source size accepted by the direct provider.
 - `MAX_VIDEO_DURATION_SECONDS`: reserved for extractor-backed providers.
 - `DOWNLOAD_EXPIRY_SECONDS`: reserved for signed storage URLs.
+- `YTDLP_PATH`: optional absolute path to the server's `yt-dlp` executable; defaults to `yt-dlp`.
 
 The in-memory limiter is intentionally best-effort in serverless deployments. Production traffic should use a durable edge limiter such as Vercel KV, Upstash Redis, or a Cloudflare rate-limit binding.
