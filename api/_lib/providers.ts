@@ -1,4 +1,4 @@
-import { analyzeDirectMedia, isDirectMediaPath, type MediaFormat, type MediaInfo } from './media'
+import { analyzeDirectMedia, isDirectMediaPath, type MediaFormat, type MediaInfo } from './media.js'
 
 export interface MediaProvider {
   canHandle(url: URL): boolean
